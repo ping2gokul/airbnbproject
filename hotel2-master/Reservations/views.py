@@ -13,7 +13,9 @@ from django.core.files.storage import FileSystemStorage
 from django.views import View
 from django.template.loader import get_template
 from .utils import render_to_pdf
-import boto3
+from rest_framework.decorators import api_view
+from django.views.decorators.csrf import csrf_exempt
+import boto3,botocore,json
 from xhtml2pdf import pisa
 ACCESS='AKIAJQDLMFBPZ4GUDVBA'
 SECRET='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'
@@ -43,6 +45,36 @@ class GeneratePDF(View):
 	return response
 
 
+@api_view(['POST'])
+@csrf_exempt
+def bookingsns(request):
+	print request
+	if request.method=='POST':
+		received_json_data=json.loads(request.body)
+		print received_json_data
+		topic="arn:aws:sns:us-east-1:845836071257:bookingconfirmed"
+		if received_json_data['Type']=='SubscriptionConfirmation':
+			Token_Received=received_json_data['Token']
+			snsclient=boto3.client('sns',aws_access_key_id=ACCESS,aws_secret_access_key=SECRET,region_name=region,config=boto3.session.Config(signature_version='s3v4'))
+			response = snsclient.confirm_subscription(TopicArn=topic,Token=Token_Received, AuthenticateOnUnsubscribe='true')
+			return HttpResponse("200 OK")
+		elif received_json_data['Type']=='Notification':
+			a=received_json_data
+			MessageReceived = json.loads(a['Message'])
+			BUCKET_ARN= MessageReceived['Records'][0]['s3']['bucket']['arn']
+			BUCKET_NAME=MessageReceived['Records'][0]['s3']['bucket']['name']
+			KEY= str(MessageReceived['Records'][0]['s3']['object']['key'])
+			s3=boto3.client('s3',aws_access_key_id=ACCESS,aws_secret_access_key=SECRET,region_name=region,config=boto3.session.Config(signature_version='s3v4'))
+			print BUCKET_ARN,BUCKET_NAME,KEY
+			try:
+				s3.download_file(BUCKET_NAME,KEY,KEY)
+#				sendmail()
+			except botocore.exceptions.ClientError as e:
+				if e.response['Error']['Code']=="404":
+					print("The object does not exist")
+				else:
+					raise
+			return HttpResponse("200 OK")
 
 
 ## Works out how long the user is staying in a hotel for also working out the total cost.
