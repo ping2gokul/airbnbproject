@@ -9,10 +9,15 @@ from HotelApp.models import Hotels,Room,Proposal
 from Authorize.models import UserRole
 from ManageHotels.models import Photo
 from Reservations.models import Reservation
-
+from django.core.files.storage import FileSystemStorage
 from django.views import View
 from django.template.loader import get_template
 from .utils import render_to_pdf
+import boto3
+from xhtml2pdf import pisa
+ACCESS='AKIAJQDLMFBPZ4GUDVBA'
+SECRET='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'
+region='us-east-1'
 
 ## Generates a PDF using the render help function and outputs it as invoice.html
 class GeneratePDF(View):
@@ -22,7 +27,21 @@ class GeneratePDF(View):
         context = {"booking":booking}
         html = template.render(context)
         pdf = render_to_pdf('invoice.html', context)
-        return HttpResponse(pdf,content_type='application/pdf')
+	outputFilename="invoice.pdf"
+	resultFile = open(outputFilename, "w+b")
+	pisaStatus = pisa.CreatePDF(html,dest=resultFile)
+	resultFile.close() 
+#	pisa.CreatePDF(StringIO(html.encode('utf-8')), pdffile)
+
+#	pdfile=open("PDF_BOOKING%s.pdf"%(self.kwargs['id']))
+#	filename="PDF_BOOKING%s.pdf"%(self.kwargs['id'])
+	s3=boto3.client('s3',aws_access_key_id=ACCESS,aws_secret_access_key=SECRET,region_name=region,config=boto3.session.Config(signature_version='s3v4'))
+#        return HttpResponse(pdf,content_type='application/pdf')
+	response = HttpResponse(pdf, content_type='application/pdf')
+	response['Content-Disposition'] = 'attachment; filename="somefilename.pdf"'
+	s3.upload_file(outputFilename,'airbnbgokul',self.kwargs['id']+'invoice.pdf')
+	return response
+
 
 
 
