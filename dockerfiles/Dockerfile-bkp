@@ -1,0 +1,30 @@
+FROM centos:7
+RUN yum update -y
+RUN yum install wget -y
+RUN wget https://dev.mysql.com/get/Downloads/MySQL-5.7/mysql-community-client-5.7.23-1.el7.x86_64.rpm
+RUN wget https://dev.mysql.com/get/Downloads/MySQL-5.7/mysql-community-common-5.7.23-1.el7.x86_64.rpm
+RUN wget https://dev.mysql.com/get/Downloads/MySQL-5.7/mysql-community-libs-compat-5.7.23-1.el7.x86_64.rpm
+RUN wget https://dev.mysql.com/get/Downloads/MySQL-5.7/mysql-community-devel-5.7.23-1.el7.x86_64.rpm
+RUN wget https://dev.mysql.com/get/Downloads/MySQL-5.7/mysql-community-libs-5.7.23-1.el7.x86_64.rpm
+RUN wget http://mirror.centos.org/centos/7/os/x86_64/Packages/MySQL-python-1.2.5-1.el7.x86_64.rpm
+RUN rpm -ivh mysql-community-libs-5.7.23-1.el7.x86_64.rpm mysql-community-libs-compat-5.7.23-1.el7.x86_64.rpm mysql-community-client-5.7.23-1.el7.x86_64.rpm mysql-community-common-5.7.23-1.el7.x86_64.rpm mysql-community-devel-5.7.23-1.el7.x86_64.rpm MySQL-python-1.2.5-1.el7.x86_64.rpm
+RUN curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+RUN python get-pip.py
+RUN yum install -y unzip
+RUN pip install django
+RUN python -m pip install wkhtmltopdf
+RUN python -m pip install djangorestframework
+RUN python -m pip install django-registration
+RUN yum install -y vim
+RUN python -m pip install django-allauth
+RUN python -m pip install django-registration
+RUN python -m pip install xhtml2pdf
+RUN python -m pip install awscli
+RUN yum install -y mlocate
+RUN yum install -y httpd mod_wsgi
+CMD hostnamectl set-hostname airbnb
+RUN mkdir -pv /var/www/html
+COPY hotel2-master /var/www/html/
+ENTRYPOINT ["/sbin/httpd", "-D", "FOREGROUND"]
+WORKDIR /var
+EXPOSE 80

@@ -1,0 +1,1 @@
+MailConfig = {'from':'gokulfinalproject@gmail.com','to':['sivaram9991@yahoo.com'],'subject':'Booking Confirmation from checkin','content':'PFA your confirmation receipt','auth':{'server':'smtp.gmail.com', 'username':'gokulfinalproject@gmail.com', 'password':'global!23', 'port':'587','startSSL':False},'cc':['']}

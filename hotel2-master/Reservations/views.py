@@ -17,8 +17,8 @@ from rest_framework.decorators import api_view
 from django.views.decorators.csrf import csrf_exempt
 import boto3,botocore,json
 from xhtml2pdf import pisa
-ACCESS='AKIAJQDLMFBPZ4GUDVBA'
-SECRET='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'
+ACCESS='AKIAIZGUB7EMMDIMH7CA'
+SECRET='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'
 region='us-east-1'
 
 ## Generates a PDF using the render help function and outputs it as invoice.html
@@ -41,7 +41,7 @@ class GeneratePDF(View):
 #        return HttpResponse(pdf,content_type='application/pdf')
 	response = HttpResponse(pdf, content_type='application/pdf')
 	response['Content-Disposition'] = 'attachment; filename="somefilename.pdf"'
-	s3.upload_file(outputFilename,'airbnbgokul',self.kwargs['id']+'invoice.pdf')
+	s3.upload_file(outputFilename,'airbnbgokulb',self.kwargs['id']+'invoice.pdf')
 	return response
 
 
@@ -52,7 +52,7 @@ def bookingsns(request):
 	if request.method=='POST':
 		received_json_data=json.loads(request.body)
 		print received_json_data
-		topic="arn:aws:sns:us-east-1:845836071257:bookingconfirmed"
+		topic="arn:aws:sns:us-east-1:165910365825:bookingconfirmed"
 		if received_json_data['Type']=='SubscriptionConfirmation':
 			Token_Received=received_json_data['Token']
 			snsclient=boto3.client('sns',aws_access_key_id=ACCESS,aws_secret_access_key=SECRET,region_name=region,config=boto3.session.Config(signature_version='s3v4'))
@@ -68,6 +68,7 @@ def bookingsns(request):
 			print BUCKET_ARN,BUCKET_NAME,KEY
 			try:
 				s3.download_file(BUCKET_NAME,KEY,KEY)
+		#		s3.download_file('airbnbgokul','2invoice.pdf','2invoice.pdf')
 #				sendmail()
 			except botocore.exceptions.ClientError as e:
 				if e.response['Error']['Code']=="404":

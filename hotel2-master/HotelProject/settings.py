@@ -17,7 +17,7 @@ DEBUG = True
 
 # This has been used in development to allow the unrecognized Domain.
 
-ALLOWED_HOSTS = ['52.203.230.43',]
+ALLOWED_HOSTS = ['52.203.230.43','52.71.153.54','54.198.34.15']
 
 
 # All the Modules which have been installed on the website must be listed .
@@ -93,7 +93,7 @@ DATABASES = {
             'NAME': 'airbnb',
             'USER': 'root',
             'PASSWORD': 'Priya@123',
-            'HOST': '172.31.86.229',
+            'HOST': '10.0.2.239',
             'PORT': '3306',
     }
 }
